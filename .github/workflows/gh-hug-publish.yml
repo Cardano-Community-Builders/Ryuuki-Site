@@ -8,6 +8,7 @@ on:
       - 'assets/**'
       - 'layouts/**'
       - 'config/**'
+    branches: [ main ]
 
   workflow_dispatch:
 
