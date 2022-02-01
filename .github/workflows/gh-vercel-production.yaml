@@ -2,7 +2,7 @@
 
 # Workflow to build and deploy site to Vercel using Hugo
 # Name of Workflow
-name: deploy-production
+name: vercel-deploy-production
 
 # Controls when the action will run. Triggers the workflow on push
 # events but only for the main/master branch
@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 1         # Fetch all history for .GitInfo and .Lastmod
           lfs: true
 
-    # Initiate deployment status
+    # Initiate GH deployment status
     - name: Start Deployment
       uses: bobheadxi/deployments@v0.4.3
       id: deployment
@@ -37,17 +37,29 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         env: Production
 
-    # Step 2 - Install Hugo (specific version)
+    - name: setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: get package-lock
+      run: npm install
+
+    - name: perfom clean install
+      run: npm ci
+
+    # Install Hugo (specific version)
     - name: Install Hugo
       uses: peaceiris/actions-hugo@v2
       with:
-          hugo-version: 'latest'
+        hugo-version: 'latest'
+        extended: true
 
-    # Step 3 - Builds the site using Hugo
+    # Builds the site using Hugo
     - name: Build
       run: hugo -v --minify
 
-    # Step 4 - Push our generated Hugo site to Vercel
+    # Push our generated Hugo site to Vercel
     - name: Deploy to Vercel
       uses: amondnet/vercel-action@v20
       id: vercel-action
@@ -60,7 +72,7 @@ jobs:
         vercel-args: '--prod'
         working-directory: public
 
-    # Update deployment status
+    # Update GH deployment status
     - name: Update Deployment Status
       uses: bobheadxi/deployments@v0.4.3
       if: always()
