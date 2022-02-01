@@ -8,6 +8,8 @@ on:
 
 jobs:
   vercel-deploy-prune:
+    runs-on: ubuntu-20.04
+
     steps:
 
     - name: Make some more metadata available as variables
