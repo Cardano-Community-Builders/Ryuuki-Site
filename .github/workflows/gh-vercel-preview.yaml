@@ -99,5 +99,5 @@ jobs:
       uses: thollander/actions-comment-pull-request@v1
       if: ${{ github.event_name == 'pull_request' }}
       with:
-        message: 'Vercel deploy URL: ${{ steps.vercel-action.outputs.preview-url }}'
+        message: 'Vercel PR (merge commit) deploy URL: ${{ steps.vercel-action.outputs.preview-url }}'
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
