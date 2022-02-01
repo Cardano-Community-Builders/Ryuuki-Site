@@ -2,13 +2,13 @@
 
 # Workflow to build and deploy site to Vercel using Hugo
 # Name of Workflow
-name: vercel-deploy-production
+name: vercel-deploy-production (staging branch)
 
 # Controls when the action will run. Triggers the workflow on push
 # events but only for the main/master branch
 on:
   push:
-    branches: [ main ]
+    branches: [ staging ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -20,7 +20,17 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
 
-    # Step 1 - Checks-out your repository under $GITHUB_WORKSPACE
+    - name: Make some more metadata available as variables
+      id: metadata
+      run: |
+        if [ ${{github.event_name }} == "pull_request" ]
+        then
+          echo "::set-output name=DEPLOY_NAME::PR-$(echo $GITHUB_REF | awk -F/ '{ print $3 }')"
+        else
+          echo "::set-output name=DEPLOY_NAME::BRANCH-${GITHUB_REF##*/}"
+        fi
+
+    # Checks-out your repository under $GITHUB_WORKSPACE
     - name: Checkout
       uses: actions/checkout@v2
       with:
@@ -30,12 +40,12 @@ jobs:
 
     # Initiate GH deployment status
     - name: Start Deployment
-      uses: bobheadxi/deployments@v0.4.3
+      uses: bobheadxi/deployments@v0.6.2
       id: deployment
       with:
         step: start
         token: ${{ secrets.GITHUB_TOKEN }}
-        env: Production
+        env: vercel-deploy-${{ steps.metadata.outputs.DEPLOY_NAME }}
 
     - name: setup Node
       uses: actions/setup-node@v2
@@ -74,7 +84,7 @@ jobs:
 
     # Update GH deployment status
     - name: Update Deployment Status
-      uses: bobheadxi/deployments@v0.4.3
+      uses: bobheadxi/deployments@v0.6.2
       if: always()
       with:
         step: finish
