@@ -18,9 +18,8 @@ jobs:
         echo "::set-output name=DEPLOY_NAME::PR-$(echo $GITHUB_REF | awk -F/ '{ print $3 }')"
 
     - name: mark environment as deactivated
-      uses: bobheadxi/deployments@v0.6.2
+      uses: strumwolf/delete-deployment-environment@v2
       with:
-        step: deactivate-env
+        # ⚠️ The provided token needs permission for admin write:org
         token: ${{ secrets.GITHUB_TOKEN }}
-        env: vercel-deploy-${{ steps.metadata.outputs.DEPLOY_NAME }}
-        desc: Deployment vercel-deploy-${{ steps.metadata.outputs.DEPLOY_NAME }} was pruned
+        environment: vercel-deploy-${{ steps.metadata.outputs.DEPLOY_NAME }}
